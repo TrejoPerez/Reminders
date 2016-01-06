@@ -74,7 +74,7 @@ public class RemindersDbAdapter {
     }
 //    CREATE
 //    note that the id will be created for you automatically
-    public void createRemainders(String name, boolean important){
+    public void createReminder(String name, boolean important){
         ContentValues values = new ContentValues();
         values.put(COL_CONTENT,name);
         values.put(COL_IMPORTANT, important ? 1:0);
