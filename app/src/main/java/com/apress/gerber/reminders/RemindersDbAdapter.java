@@ -1,6 +1,9 @@
 package com.apress.gerber.reminders;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -27,14 +30,14 @@ public class RemindersDbAdapter {
     private static final String TABLE_NAME = "tbl_remdrs";
     public static final int DATABASE_VERSION = 1;
 
-    private final Context mCtx = null;
+    private final Context mCtx;
 
 //    SQL statement used to create the database
 
     private static final String  DATABASE_CREATE=
-            "CREATE TABLE if not exists" + TABLE_NAME +  "(" +
+            "CREATE TABLE if not exists " + TABLE_NAME +  " ( " +
                     COL_ID + " INTEGER PRIMARY KEY autoincrement, " +
-                    COL_CONTENT + "TEXT," + COL_IMPORTANT + " INTEGER );";
+                    COL_CONTENT + " TEXT, " + COL_IMPORTANT + " INTEGER );";
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
         DatabaseHelper(Context context){
@@ -55,7 +58,75 @@ public class RemindersDbAdapter {
             onCreate(db);
         }
     }
+    public RemindersDbAdapter(Context ctx){
+        this.mCtx = ctx;
+    }
+//    open
+    public void open() throws SQLException {
+        mDbHerlper = new DatabaseHelper(mCtx);
+        mDB = mDbHerlper.getWritableDatabase();
+    }
+//    close
+    public void close(){
+        if(mDbHerlper!=null){
+            mDbHerlper.close();
+        }
+    }
+//    CREATE
+//    note that the id will be created for you automatically
+    public void createRemainders(String name, boolean important){
+        ContentValues values = new ContentValues();
+        values.put(COL_CONTENT,name);
+        values.put(COL_IMPORTANT, important ? 1:0);
+        mDB.insert(TABLE_NAME,null,values);
+    }
+//    overloaded to take a reminder
+    public long createReminder(Reminder reminder){
+        ContentValues values = new ContentValues();
+        values.put(COL_CONTENT, reminder.getContent());//Contact Name
+        values.put(COL_IMPORTANT,reminder.getImportant());//Contact Phone Number
 
+//        Inserting Row
+        return mDB.insert(TABLE_NAME,null,values);
+    }
+//    Read
 
+    public Reminder fetchReminderById(int id){
+        Cursor cursor = mDB.query(TABLE_NAME,new String[]{COL_ID,
+                COL_CONTENT,COL_IMPORTANT},COL_ID+"=?",
+                new String[]{String.valueOf(id)},null,null,null,null);
+        if(cursor!=null) cursor.moveToFirst();
+        return new Reminder(
+                cursor.getInt(INDEX_ID),
+                cursor.getString(INDEX_CONTENT),
+                cursor.getInt(INDEX_IMPORTANT));
 
+    }
+
+    public Cursor fetchAllReminders(){
+        Cursor mCursor = mDB.query(TABLE_NAME,new String[]{COL_ID,
+                                    COL_CONTENT,COL_IMPORTANT},
+                null,null,null,null,null
+        );
+        if(mCursor!=null)mCursor.moveToFirst();
+        return mCursor;
+    }
+//    Update
+
+    public void updateReminder(Reminder reminder){
+        ContentValues values = new ContentValues();
+        values.put(COL_CONTENT,reminder.getContent());
+        values.put(COL_IMPORTANT,reminder.getImportant());
+        mDB.update(TABLE_NAME,values,
+                COL_ID + "=?", new String[]{String.valueOf(reminder.getId())});
+    }
+//    Delete
+    public void deleteReminderById(int nId){
+        mDB.delete(TABLE_NAME,COL_ID + "=?", new String[]{String.valueOf(nId)});
+    }
+
+    public void deleteAllReminders(){
+        mDB.delete(TABLE_NAME,null,null);
+        mDB.delete(TABLE_NAME,null,null);
+    }
 }

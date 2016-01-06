@@ -14,27 +14,27 @@ public class Reminder {
         this.mImportant = mImportant;
     }
 
-    public int getmId() {
+    public int getId() {
         return mId;
     }
 
-    public void setmId(int mId) {
+    public void setId(int mId) {
         this.mId = mId;
     }
 
-    public String getmContent() {
+    public String getContent() {
         return mContent;
     }
 
-    public void setmContent(String mContent) {
+    public void setContent(String mContent) {
         this.mContent = mContent;
     }
 
-    public int getmImportant() {
+    public int getImportant() {
         return mImportant;
     }
 
-    public void setmImportant(int mImportant) {
+    public void setImportant(int mImportant) {
         this.mImportant = mImportant;
     }
 }
