@@ -19,6 +19,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -42,6 +43,7 @@ public class RemindersActivity extends AppCompatActivity {
         TextView titleView = (TextView)dialog.findViewById(R.id.custom_title);
         final EditText editCustom = (EditText)dialog.findViewById(R.id.custom_edit_reminder);
         Button commitButton = (Button)dialog.findViewById(R.id.custom_button_commit);
+        final CheckBox checkBox = (CheckBox) dialog.findViewById(R.id.custom_check_box);
         LinearLayout rootLayout = (LinearLayout) dialog.findViewById(R.id.custom_root_layout);
         final boolean isEditOperation = (reminder != null);
 //        this is for an edit
@@ -51,6 +53,31 @@ public class RemindersActivity extends AppCompatActivity {
             editCustom.setText(reminder.getContent());
             rootLayout.setBackgroundColor(getResources().getColor(R.color.blue));
         }
+        commitButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                String reminderText = editCustom.getText().toString();
+                if(isEditOperation){
+                    Reminder remiderEdited = new Reminder(reminder.getId(),
+                            reminderText,checkBox.isChecked() ? 1 : 0);
+                    mDbAdapter.updateReminder(remiderEdited);
+//                    this is for new reminder
+
+                }else {
+                    mDbAdapter.createReminder(reminderText,checkBox.isChecked());
+                }
+                dialog.dismiss();
+            }
+        });
+        Button buttonCancel = (Button) dialog.findViewById(R.id.custom_button_cancel);
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
     @Override
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -67,7 +94,7 @@ public class RemindersActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             //Clear all datamDbAdapter.deleteAllReminders();
             //Add some data
-            insertSomeReminders();
+           // insertSomeReminders();
         }
 
         Cursor cursor = mDbAdapter.fetchAllReminders();
@@ -111,12 +138,13 @@ public class RemindersActivity extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //                        edit reminder
                         if(position == 0){
-                            Toast.makeText(RemindersActivity.this, "edit "
-                                    + masterListPosition, Toast.LENGTH_SHORT).show();
+                           int nId = getIdFromPosition(masterListPosition);
+                            Reminder reminder = mDbAdapter.fetchReminderById(nId);
+                            fireCustomDialog(reminder);
 //                            delete Reminder
                         }else{
-                            Toast.makeText(RemindersActivity.this,"Delete"
-                            + masterListPosition, Toast.LENGTH_SHORT).show();
+                            mDbAdapter.deleteReminderById(getIdFromPosition(masterListPosition));
+                            mCursorAdapter.changeCursor(mDbAdapter.fetchAllReminders());
                         }
                         dialog.dismiss();
                     }
@@ -206,7 +234,7 @@ public class RemindersActivity extends AppCompatActivity {
         switch(item.getItemId()){
             case R.id.action_new:
 //              Crete new reminder
-                Log.d(getLocalClassName(),"Create new Reminder");
+                fireCustomDialog(null);
                 return true;
             case R.id.action_exit:
                 finish();

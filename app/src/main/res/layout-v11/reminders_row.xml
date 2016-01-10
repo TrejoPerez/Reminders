@@ -10,7 +10,7 @@
         android:layout_height="48dp"
         android:background="?android:attr/activatedBackgroundIndicator">
 
-        <viewx
+        <view
             android:layout_width="10dp"
             android:layout_height="match_parent"
             android:id="@+id/row_tab"

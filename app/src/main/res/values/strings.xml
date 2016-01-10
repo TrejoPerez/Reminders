@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Reminders</string>
     <string name="new_reminder">New Reminder:</string>
-    <string name="important">Important</string>
+
     <string name="cancel">Cancel</string>
     <string name="commit">Commit</string>
 </resources>
