@@ -88,7 +88,7 @@ public class RemindersActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setIcon(R.mipmap.ic_launcher);
+        actionBar.setIcon(R.mipmap.ic_launcher1);
         mListView= (ListView)findViewById(R.id.reminders_list_view);
         //The arrayAdatper is the controller in our
         //model-view-controller relationship. (controller)
